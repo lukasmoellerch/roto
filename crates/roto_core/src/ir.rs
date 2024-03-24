@@ -107,7 +107,7 @@ impl Display for IRType {
                 }
                 write!(f, "\n}}")
             }
-            IRType::Variant(PrimitiveVariant { variants: variants }) => {
+            IRType::Variant(PrimitiveVariant { variants }) => {
                 write!(f, "enum {{")?;
                 for PrimitiveVariantOption {
                     name: k,
