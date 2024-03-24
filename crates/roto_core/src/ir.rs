@@ -18,6 +18,13 @@ pub enum TypeName {
 }
 
 #[derive(Debug, Clone)]
+pub struct PrimitiveStructField {
+    pub name: String,
+    pub type_: PrimitiveType,
+    pub comment: Option<String>,
+}
+
+#[derive(Debug, Clone)]
 pub struct PrimitiveStruct {
     pub fields: Vec<PrimitiveStructField>,
 }
@@ -43,7 +50,7 @@ impl Intersectable<PrimitiveStruct, PrimitiveStruct> for PrimitiveStruct {
             .iter()
             .map(|f| f.name.clone())
             .collect::<HashSet<_>>();
-        
+
         for f in &self.fields {
             if b_fields_names.contains(&f.name) {
                 panic!("Intersection of structs with overlapping fields");
@@ -57,15 +64,20 @@ impl Intersectable<PrimitiveStruct, PrimitiveStruct> for PrimitiveStruct {
         }
 
         out
-
     }
+}
+
+#[derive(Debug, Clone)]
+pub struct PrimitiveVariantOption {
+    pub name: String,
+    pub type_: PrimitiveType,
+    pub comment: Option<String>,
 }
 
 #[derive(Debug, Clone)]
 pub struct PrimitiveVariant {
     pub variants: Vec<PrimitiveVariantOption>,
 }
-
 
 impl Intersectable<PrimitiveVariant, PrimitiveVariant> for PrimitiveVariant {
     fn intersect(&self, other: &PrimitiveVariant) -> PrimitiveVariant {
@@ -91,7 +103,6 @@ impl Intersectable<PrimitiveVariant, PrimitiveVariant> for PrimitiveVariant {
         out
     }
 }
-
 
 impl PrimitiveVariant {
     pub fn new() -> Self {
@@ -163,20 +174,6 @@ pub struct NamedIRType {
 pub struct NamedPrimitiveType {
     pub name: TypeName,
     pub t: PrimitiveType,
-}
-
-#[derive(Debug, Clone)]
-pub struct PrimitiveStructField {
-    pub name: String,
-    pub type_: PrimitiveType,
-    pub comment: Option<String>,
-}
-
-#[derive(Debug, Clone)]
-pub struct PrimitiveVariantOption {
-    pub name: String,
-    pub type_: PrimitiveType,
-    pub comment: Option<String>,
 }
 
 impl Display for IRType {

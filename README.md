@@ -1,8 +1,8 @@
 # Roto
 
-Grpc has .proto files, Thrift has .thrift, but what do standard REST APIs have? Nothing. Ok well, they have OpenAPI, but that's barely human readable and definitely not something you'd want to write by hand. Roto is a new language for writing REST APIs. It's designed to be human readable and writable, and to be easy to parse and generate code from for various programming languages.
+Grpc has .proto files, Thrift has .thrift, but what do standard REST APIs have? Nothing. Ok well, they have OpenAPI, but that's barely human readable and definitely not something you'd want to write by hand. Roto tries to tackle that problem. It's designed to be human readable and writable, and to be easy to parse and generate code from for various programming languages. Although it is designed with REST APIs in mind, it is mainly a language for programming with types, and can be used for other things as well.
 
-At the moment it's mostly just a language with a single example - no proper spec, barely a parser, and no code generation. We'll see how it goes.
+At the moment it's mostly just a language with a couple of examples, a crappy parser, and code generation for Python. We'll see how it goes.
 
 The focus at the moment is on the type system which is a bit of a mixture between rust and typescript - treating types as values while having a rust-like syntax with variants and structs being the main building blocks. Here's an example of what the type system looks like:
 

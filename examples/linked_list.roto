@@ -1,0 +1,13 @@
+type Optional<T> = enum {
+    some(T),
+    none(unit),
+};
+
+type LinkedListNode<T> = struct {
+    value: T,
+    next: Optional<T=LinkedListNode<T=T>>,
+};
+
+type LinkedList<T> = Optional<T=LinkedListNode<T=T>>;
+
+type LinkedIntList = LinkedList<T=int>;

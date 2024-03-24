@@ -370,12 +370,16 @@ dependencies = [
 [[package]]
 name = "roto_py_msgspec_backend"
 version = "0.1.0"
+dependencies = [
+ "roto_core",
+]
 
 [[package]]
 name = "roto_py_msgspec_backend_example"
 version = "0.1.0"
 dependencies = [
  "roto_core",
+ "roto_py_msgspec_backend",
 ]
 
 [[package]]

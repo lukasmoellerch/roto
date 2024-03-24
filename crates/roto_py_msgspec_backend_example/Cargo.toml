@@ -7,3 +7,4 @@ edition = "2021"
 
 [dependencies]
 roto_core = { path = "../roto_core" }
+roto_py_msgspec_backend = { path = "../roto_py_msgspec_backend" }
