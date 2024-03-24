@@ -1,10 +1,14 @@
 use core::fmt;
 use std::{
-    collections::BTreeMap,
+    collections::{BTreeMap, HashSet},
     fmt::{Display, Formatter},
 };
 
 use crate::ast;
+
+pub trait Intersectable<A, B> {
+    fn intersect(&self, other: &B) -> A;
+}
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum TypeName {
@@ -18,17 +22,94 @@ pub struct PrimitiveStruct {
     pub fields: Vec<PrimitiveStructField>,
 }
 
+impl PrimitiveStruct {
+    pub fn new() -> Self {
+        PrimitiveStruct { fields: Vec::new() }
+    }
+    pub fn add_field(&mut self, name: String, type_: PrimitiveType, comment: Option<String>) {
+        self.fields.push(PrimitiveStructField {
+            name,
+            type_,
+            comment,
+        });
+    }
+}
+
+impl Intersectable<PrimitiveStruct, PrimitiveStruct> for PrimitiveStruct {
+    fn intersect(&self, other: &PrimitiveStruct) -> PrimitiveStruct {
+        let mut out = PrimitiveStruct::new();
+        let b_fields_names = other
+            .fields
+            .iter()
+            .map(|f| f.name.clone())
+            .collect::<HashSet<_>>();
+        
+        for f in &self.fields {
+            if b_fields_names.contains(&f.name) {
+                panic!("Intersection of structs with overlapping fields");
+            }
+
+            out.fields.push(f.clone());
+        }
+
+        for f in &other.fields {
+            out.fields.push(f.clone());
+        }
+
+        out
+
+    }
+}
+
 #[derive(Debug, Clone)]
 pub struct PrimitiveVariant {
     pub variants: Vec<PrimitiveVariantOption>,
 }
 
-#[derive(Debug, Clone)]
-pub enum PrimitiveType {
-    Reference(usize),
-    Builtin(ast::Builtin),
+
+impl Intersectable<PrimitiveVariant, PrimitiveVariant> for PrimitiveVariant {
+    fn intersect(&self, other: &PrimitiveVariant) -> PrimitiveVariant {
+        let mut out = PrimitiveVariant::new();
+        let b_variants_names = other
+            .variants
+            .iter()
+            .map(|v| v.name.clone())
+            .collect::<HashSet<_>>();
+
+        for v in &self.variants {
+            if b_variants_names.contains(&v.name) {
+                panic!("Intersection of variants with overlapping fields");
+            }
+
+            out.variants.push(v.clone());
+        }
+
+        for v in &other.variants {
+            out.variants.push(v.clone());
+        }
+
+        out
+    }
 }
 
+
+impl PrimitiveVariant {
+    pub fn new() -> Self {
+        PrimitiveVariant {
+            variants: Vec::new(),
+        }
+    }
+    pub fn add_variant(&mut self, name: String, type_: PrimitiveType, comment: Option<String>) {
+        self.variants.push(PrimitiveVariantOption {
+            name,
+            type_,
+            comment,
+        });
+    }
+}
+
+/// IRType is the most generate type of type - it can represent any type that can be used in the
+/// IR. This includes structs, variants, references, and builtins.
 #[derive(Debug, Clone)]
 pub enum IRType {
     Struct(PrimitiveStruct),
@@ -37,6 +118,17 @@ pub enum IRType {
     Builtin(ast::Builtin),
 }
 
+/// A primitive type is a type that is "constant" in size, i.e. it does not have any direct
+/// nesting, but can reference other types. This is used to represent the type of values in the
+/// ir.
+#[derive(Debug, Clone)]
+pub enum PrimitiveType {
+    Reference(usize),
+    Builtin(ast::Builtin),
+}
+
+/// A resolved IR type is a type that has been resolved to a specific type. There are no direct references
+/// to other types.
 pub enum ResolvedIRType {
     Struct(PrimitiveStruct),
     Variant(PrimitiveVariant),
