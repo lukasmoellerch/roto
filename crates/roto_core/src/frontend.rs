@@ -41,7 +41,7 @@ impl TypeAllocator {
     }
 
     fn set(&mut self, id: usize, name: TypeName, t: IRType) {
-        self.types.insert(id, NamedIRType { name: name, t });
+        self.types.insert(id, NamedIRType { name: name, type_: t });
     }
 }
 
@@ -96,7 +96,7 @@ impl IRCompiler {
         match t {
             IRType::Reference(id) => {
                 let named_type = self.allocator.types.get(id).unwrap();
-                self.resolve_ir_type(&named_type.t)
+                self.resolve_ir_type(&named_type.type_)
             }
             IRType::Builtin(builtin) => ResolvedIRType::Builtin(builtin.clone()),
             IRType::Struct(fields) => ResolvedIRType::Struct(fields.clone()),

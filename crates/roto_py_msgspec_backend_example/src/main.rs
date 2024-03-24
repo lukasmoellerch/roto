@@ -54,12 +54,12 @@ fn main() {
         stack: VecDeque::new(),
     };
 
-    for (_i, NamedIRType { name, t }) in compiler.iter_types() {
+    for (_i, NamedIRType { name, type_: t }) in compiler.iter_types() {
         match name {
             TypeName::Variable(_) => {
                 primitive_type_writer.stack.push_back(NamedIRType {
                     name: name.clone(),
-                    t: t.clone(),
+                    type_: t.clone(),
                 });
             }
             _ => {}
@@ -67,7 +67,7 @@ fn main() {
     }
 
     while !primitive_type_writer.stack.is_empty() {
-        let NamedIRType { name, t } = primitive_type_writer.stack.pop_front().unwrap();
+        let NamedIRType { name, type_: t } = primitive_type_writer.stack.pop_front().unwrap();
         if primitive_type_writer.compiled.contains(&name) {
             continue;
         }

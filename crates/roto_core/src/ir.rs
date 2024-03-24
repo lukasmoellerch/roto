@@ -168,12 +168,7 @@ impl Display for TypeName {
 #[derive(Debug, Clone)]
 pub struct NamedIRType {
     pub name: TypeName,
-    pub t: IRType,
-}
-
-pub struct NamedPrimitiveType {
-    pub name: TypeName,
-    pub t: PrimitiveType,
+    pub type_: IRType,
 }
 
 impl Display for IRType {

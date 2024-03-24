@@ -41,7 +41,7 @@ fn main() {
         compiler.compile_global(name.clone(), &expr);
     }
 
-    for (i, NamedIRType { name, t }) in compiler.iter_types() {
+    for (i, NamedIRType { name, type_: t }) in compiler.iter_types() {
         println!("type {}#{} = {}", name, i, t);
     }
 
