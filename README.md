@@ -1,6 +1,6 @@
-# RestBuf
+# Roto
 
-Grpc has .proto files, Thrift has .thrift, but what do standard REST APIs have? Nothing. Ok well, they have OpenAPI, but that's barely human readable and definitely not something you'd want to write by hand. RestBuf is a new language for writing REST APIs. It's designed to be human readable and writable, and to be easy to parse and generate code from for various programming languages.
+Grpc has .proto files, Thrift has .thrift, but what do standard REST APIs have? Nothing. Ok well, they have OpenAPI, but that's barely human readable and definitely not something you'd want to write by hand. Roto is a new language for writing REST APIs. It's designed to be human readable and writable, and to be easy to parse and generate code from for various programming languages.
 
 At the moment it's mostly just a language with a single example - no proper spec, barely a parser, and no code generation. We'll see how it goes.
 
