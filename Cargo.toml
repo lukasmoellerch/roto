@@ -1,0 +1,8 @@
+[workspace]
+resolver = "2"
+members = [
+    "crates/roto_core",
+    "crates/roto_print_ir",
+    "crates/roto_py_msgspec_backend",
+    "crates/roto_py_msgspec_backend_example",
+]

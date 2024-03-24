@@ -1,0 +1,149 @@
+use std::collections::BTreeMap;
+use crate::ast::{
+    Builtin,
+    StructField,
+    StructTypeExpression,
+    TypeAliasDeclaration,
+    TypeExpression,
+    VariantOption,
+    VariantTypeExpression,
+    Annotation,
+};
+
+grammar;
+
+SingleComma: () = {
+    "," => (),
+};
+
+Comma<Rule>: Vec<Rule> = {
+    <rules: (<Rule> SingleComma)*> <last: Rule?> => {
+        let mut rules = rules;
+        rules.extend(last);
+        rules
+    }
+}
+
+
+
+GenericParameterDeclaration: Vec<String> = {
+    "<" <params: Comma<Ident>> ">" => params,
+}
+
+TypeAliasDeclaration: TypeAliasDeclaration = {
+    <annotations: Annotation*>
+    "type" <name:Ident> <params: GenericParameterDeclaration?> "=" <type_:TypeExpression> ";" => {
+        TypeAliasDeclaration {
+            annotations,
+            name,
+            params: params.unwrap_or_default(),
+            type_
+        }
+    },
+};
+
+Builtin: Builtin = {
+    "int" => Builtin::Int,
+    "string" => Builtin::String,
+    "float" => Builtin::Float,
+    "bool" => Builtin::Bool,
+    "unit" => Builtin::Unit,
+};
+
+Comment: String = {
+    // double slash comment
+    r#"//.*\n"# => {
+        let comment = &<>[2..<>.len()-1];
+        comment.trim().to_string()
+    },
+};
+
+AnnotationArgument: (String, String) = {
+    <key:Ident> "=" <value:Ident> => (key, value),
+};
+
+Annotation: Annotation = {
+    "@" <name:Ident> "(" <args:Comma<AnnotationArgument>> ")" => {
+        Annotation { name, args }
+    },
+}
+
+Field: StructField = {
+    <comment:Comment*> <name:Ident> ":" <type_:TypeExpression> "," => {
+        StructField {
+            name: name,
+            comment: if comment.len() > 0 {
+                Some(comment.join("\n"))
+            } else {
+                None
+            },
+            type_: type_
+        }
+    },
+};
+
+InlineStructType: StructTypeExpression = {
+    "struct" "{" <fields:Field+> "}" => {
+        StructTypeExpression { fields: fields }
+    },
+};
+
+Variant: VariantOption = {
+    <comment:Comment*> <name:Ident> "(" <type_:TypeExpression> ")" "," => {
+        VariantOption {
+            name: name,
+            comment: if comment.len() > 0 {
+                Some(comment.join("\n"))
+            } else {
+                None
+            },
+            type_: type_
+        }
+    },
+};
+
+InlineVariantType: VariantTypeExpression = {
+    "enum" "{" <variants:Variant+> "}" => {
+        VariantTypeExpression { variants: variants }
+    },
+};
+
+GenericParameterAssignment: (String, TypeExpression) = {
+    <name:Ident> "=" <type_:TypeExpression> => (name, type_),
+};
+
+GenericTypeCallParams: BTreeMap<String, TypeExpression> = {
+    "<" <params: Comma<GenericParameterAssignment>> ">" => {
+        let mut map = BTreeMap::new();
+        for (name, type_) in params {
+            map.insert(name, type_);
+        }
+        map
+    }
+};
+
+TypeAtom: TypeExpression = {
+    <inline_struct:InlineStructType> => TypeExpression::Struct(inline_struct),
+    <inline_variant:InlineVariantType> => TypeExpression::Variant(inline_variant),
+    <name:Ident> <params: GenericTypeCallParams?> => {
+        match params {
+            Some(params) => TypeExpression::Generic(name, params),
+            None => TypeExpression::Variable(name),
+        }
+    },
+    <builtin:Builtin> => TypeExpression::Builtin(builtin),
+};
+
+TypeExpression: TypeExpression = {
+    <atom:TypeAtom> => atom,
+    <left:TypeExpression> "&" <right:TypeAtom> => TypeExpression::Intersection(Box::new(left), Box::new(right)),
+};
+
+
+pub Program: Vec<TypeAliasDeclaration> = {
+    <decls: TypeAliasDeclaration*> => decls
+};
+
+Ident: String = {
+    <id:r#"[a-zA-Z_][a-zA-Z0-9_]*"#> => id.to_string(),
+};

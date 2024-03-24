@@ -1,0 +1,34 @@
+type Identified<T> = T & struct {
+  id: string,
+};
+
+type Array<T> = struct {
+  elements: T,
+};
+
+type CollectionResponse<T> = struct {
+  items: Array<T=T>,
+  total: int,
+  cursor: string,
+};
+
+@json(strategy=inlined_literal)
+type UserStatus = enum {
+  active(unit),
+  inactive(unit),
+  pending(unit),
+};
+
+type UserProperties = struct {
+    // The user's name, e.g. "Alice".
+    name: string,
+    // The user's age in full years, e.g. 42.
+    age: int,
+    status: UserStatus,
+};
+
+
+type User = Identified<T=UserProperties>;
+type UserCollectionResponse = CollectionResponse<T=User>;
+
+type X = UserCollectionResponse;
